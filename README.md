@@ -4,7 +4,7 @@
 ## Developers
 
   - Andre Luiz [LinkedIn](https://www.linkedin.com/in/andre-oliveira-1066b7220/)
-  - Marcella Mello [LinkedIn] (https://www.linkedin.com/in/marcellasouzamello/)
+  - Marcella Mello [LinkedIn](https://www.linkedin.com/in/marcellasouzamello/)
 
 
 A web-based waiting list management system for airport lounges, built with **Django**. The application allows staff to register passengers, notify them via **SMS** or **Email** when their lounge spot is ready, and manage the queue with full transparency.
