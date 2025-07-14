@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Your Lounge Spot is Ready</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #0c6efd;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>✈️ Your Lounge Spot is Ready!</h2>
+        <p>Hello <strong>{{ name }}</strong>,</p>
+        <p>Your turn has arrived! We are ready to welcome you and your <span class="highlight">{{ guests }}</span>
+            guest(s) into the Liffey Lounge.</p>
+
+        <p>Please head to the reception within the next <strong>10 minutes</strong> to confirm your entry.</p>
+
+        <p>If you are unable to come, kindly reply to this message or notify reception to release your place for the
+            next guest in line.</p>
+
+        <p>Thank you,<br>
+            <strong>Liffey Lounge Team</strong>
+        </p>
+
+        <div class="footer">
+            This is an automated message. Please do not reply directly to this email.
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,4 @@
+Django==5.2.4
+twilio
+xhtml2pdf
+openpyxl

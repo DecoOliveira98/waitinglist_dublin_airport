@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add Passenger to Queue</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container py-5">
+        <div class="card shadow">
+            <div class="card-body">
+                <h3 class="card-title text-center">➕ Add Passenger</h3>
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Name:</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Country Code:</label>
+                        <select name="country_code" class="form-select" required>
+                            <option value="+353">🇮🇪 +353 (Ireland)</option>
+                            <option value="+55">🇧🇷 +55 (Brazil)</option>
+                            <option value="+1">🇺🇸 +1 (USA)</option>
+                            <option value="+44">🇬🇧 +44 (United Kingdom)</option>
+                            <option value="+33">🇫🇷 +33 (France)</option>
+                            <option value="+49">🇩🇪 +49 (Germany)</option>
+                            <option value="+34">🇪🇸 +34 (Spain)</option>
+                            <option value="+39">🇮🇹 +39 (Italy)</option>
+                            <option value="+351">🇵🇹 +351 (Portugal)</option>
+                            <option value="+86">🇨🇳 +86 (China)</option>
+                            <option value="+91">🇮🇳 +91 (India)</option>
+                            <option value="+81">🇯🇵 +81 (Japan)</option>
+                            <option value="+82">🇰🇷 +82 (South Korea)</option>
+                            <option value="+61">🇦🇺 +61 (Australia)</option>
+                            <option value="+64">🇳🇿 +64 (New Zealand)</option>
+                            <option value="+971">🇦🇪 +971 (UAE)</option>
+                            <option value="+966">🇸🇦 +966 (Saudi Arabia)</option>
+                            <option value="+27">🇿🇦 +27 (South Africa)</option>
+                            <option value="+52">🇲🇽 +52 (Mexico)</option>
+                            <option value="+54">🇦🇷 +54 (Argentina)</option>
+                            <option value="+57">🇨🇴 +57 (Colombia)</option>
+                            <option value="+56">🇨🇱 +56 (Chile)</option>
+                            <option value="+41">🇨🇭 +41 (Switzerland)</option>
+                            <option value="+46">🇸🇪 +46 (Sweden)</option>
+                            <option value="+47">🇳🇴 +47 (Norway)</option>
+                            <option value="+358">🇫🇮 +358 (Finland)</option>
+                            <option value="+45">🇩🇰 +45 (Denmark)</option>
+                            <option value="+31">🇳🇱 +31 (Netherlands)</option>
+                            <option value="+32">🇧🇪 +32 (Belgium)</option>
+                            <option value="+48">🇵🇱 +48 (Poland)</option>
+                            <option value="+30">🇬🇷 +30 (Greece)</option>
+                            <option value="+420">🇨🇿 +420 (Czech Republic)</option>
+                            <option value="+36">🇭🇺 +36 (Hungary)</option>
+                            <option value="+90">🇹🇷 +90 (Turkey)</option>
+                            <!-- Adicione mais conforme precisar -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Local Phone Number:</label>
+                        <input type="tel" name="local_phone" class="form-control" required placeholder="0832047579">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Number of Guests:</label>
+                        <input type="number" name="guests" class="form-control" min="0" value="0">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notification Method:</label>
+                        <select name="notification_method" class="form-select" required>
+                            <option value="sms">SMS</option>
+                            <option value="email">Email</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email (only if Email selected):</label>
+                        <input type="email" name="email" class="form-control" placeholder="example@email.com">
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="/" class="btn btn-secondary">← Back to List</a>
+                        <button type="submit" class="btn btn-success">Add to Queue</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
