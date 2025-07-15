@@ -17,13 +17,20 @@ A web-based waiting list management system for airport lounges, built with **Dja
 - Notify passengers via:
   - ✅ SMS (Twilio)
   - ✅ Email (Gmail SMTP)
+
 - View and manage the live waiting list.
+
 - Export call logs to:
+
   - 📄 PDF
   - 📊 Excel
+
 - View individual passenger details.
+
 - Call next or specific passengers.
+
 - Skip or remove passengers manually.
+
 - Responsive UI built with **Bootstrap 5**.
 
 ---
