@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------- Segurança ----------------
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv)
+ALLOWED_HOSTS = [ '*' ]
 
 # ---------------- Aplicações ----------------
 INSTALLED_APPS = [
