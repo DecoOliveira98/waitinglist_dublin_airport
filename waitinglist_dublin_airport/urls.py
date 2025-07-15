@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from waitlist import views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -40,8 +41,18 @@ urlpatterns = [
     # Detalhes e ações por passageiro
     path('passenger/<int:id>/', views.passenger_detail, name='passenger_detail'),
     path('passenger/<int:id>/skip/', views.skip_passenger, name='skip_passenger'),
+    path('passenger/<int:id>/call/', views.call_specific_passenger, name='call_specific_passenger'),
     path('delete/<int:pk>/', views.delete_passenger, name='delete_passenger'),
 
-    path('passenger/<int:id>/call/', views.call_specific_passenger, name='call_specific_passenger'),
+    # Webhook do Twilio para receber resposta de SMS
+    path('sms/reply/', views.twilio_reply, name='sms_reply'),
+   
+    path('auto-remove/<int:id>/', views.auto_remove_passenger, name='auto_remove'),
+
+    # Cancelar vaga
+    path('cancel/<int:guest_id>/', views.cancel_spot, name='cancel_spot'),
+    path('cancel/confirmation/', views.cancel_confirmation, name='cancel_confirmation'),
+
 
 ]
+

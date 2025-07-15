@@ -1,4 +1,8 @@
 from django.db import models
+from django.utils import timezone
+
+
+
 NOTIFICATION_CHOICES = [
     ('sms', 'SMS'),
     ('email', 'Email'),
@@ -6,12 +10,14 @@ NOTIFICATION_CHOICES = [
 
 class Passenger(models.Model):
     name = models.CharField(max_length=100)
-    country_code = models.CharField(max_length=6, default='+353')  # Irlanda como default
-    local_phone = models.CharField(max_length=20)
+    country_code = models.CharField(max_length=7, default='+353')  # Irlanda como default
+    local_phone = models.CharField(max_length=35)
     email = models.EmailField(blank=True, null=True)
     notification_method = models.CharField(max_length=10, choices=NOTIFICATION_CHOICES, default='sms')
     guests = models.IntegerField(default=0)
     joined_at = models.DateTimeField(auto_now_add=True)
+    called = models.BooleanField(default=False)
+    called_at = models.DateTimeField(null=True, blank=True)
 
     @property
     def full_phone(self):

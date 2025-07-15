@@ -3,10 +3,47 @@
 
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="refresh" content="10">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lounge Waiting List</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function getCSRFToken() {
+            const name = 'csrftoken=';
+            const cookies = document.cookie.split(';');
+            for (let c of cookies) {
+                c = c.trim();
+                if (c.startsWith(name)) return c.substring(name.length, c.length);
+            }
+            return '';
+        }
+
+        function startCountdown(id, calledAt) {
+            const target = new Date(calledAt).getTime() + 10 * 60 * 1000;
+            const timer = setInterval(function () {
+                const now = new Date().getTime();
+                const distance = target - now;
+
+                if (distance <= 0) {
+                    clearInterval(timer);
+                    document.getElementById("timer-" + id).innerHTML = "⛔ Expired";
+
+                    fetch(`/auto-remove/${id}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCSRFToken()
+                        }
+                    }).then(() => {
+                        const row = document.getElementById(`row-${id}`);
+                        if (row) row.remove();
+                    });
+                } else {
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    document.getElementById("timer-" + id).innerHTML = `${minutes}m ${seconds}s`;
+                }
+            }, 1000);
+        }
+    </script>
 </head>
 
 <body>
@@ -22,22 +59,32 @@
                             <th>Phone</th>
                             <th>Guests</th>
                             <th>Time Joined</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for p in passengers %}
-                        <tr>
+                        <tr id="row-{{ p.id }}">
                             <td>{{ forloop.counter }}</td>
                             <td><a href="{% url 'passenger_detail' p.id %}">{{ p.name }}</a></td>
-
                             <td>{{ p.full_phone }}</td>
-
                             <td>{{ p.guests }}</td>
                             <td>{{ p.joined_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                {% if p.called %}
+                                <span class="badge bg-warning text-dark">Called</span><br>
+                                <span id="timer-{{ p.id }}">...</span>
+                                <script>
+                                    startCountdown("{{ p.id }}", "{{ p.called_at|date:'Y-m-d H:i:s' }}");
+                                </script>
+                                {% else %}
+                                <span class="badge bg-success">Waiting</span>
+                                {% endif %}
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center">No passengers in the queue.</td>
+                            <td colspan="6" class="text-center">No passengers in the queue.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -48,8 +95,6 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary">📢 Call Next Passenger</button>
                         <a href="/logs/" class="btn btn-outline-dark">📋 View Logs</a>
-
-
                     </form>
                 </div>
             </div>
