@@ -10,9 +10,8 @@
 
 ## ✨ Features
 
-- Add passengers with name, phone, number of guests, and preferred notification method.
+- Add passengers with name, phone, number of guests, and notification method.
 - Notify passengers via:
-  - ✅ SMS (Twilio)
   - ✅ Email (Gmail SMTP)
 - View and manage the live waiting list.
 - Export call logs to:
@@ -63,10 +62,6 @@ pip install -r requirements.txt
 Crie um arquivo `.env` com o seguinte conteúdo:
 
 ```
-# Twilio
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
 
 # Email (Gmail SMTP com senha de app)
 HOST_USER=your.email@gmail.com
@@ -78,7 +73,7 @@ EMAIL_USE_TLS=True
 
 # Django Settings
 SECRET_KEY=your_secret_key
-DEBUG=True
+DEBUG=False
 ALLOWED_HOSTS=127.0.0.1,localhost
 ```
 
