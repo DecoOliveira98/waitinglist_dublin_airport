@@ -57,9 +57,11 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Phone</th>
+                            <th>Email</th>
                             <th>Guests</th>
                             <th>Time Joined</th>
                             <th>Status</th>
+
                         </tr>
                     </thead>
                     <tbody>
@@ -68,6 +70,7 @@
                             <td>{{ forloop.counter }}</td>
                             <td><a href="{% url 'passenger_detail' p.id %}">{{ p.name }}</a></td>
                             <td>{{ p.full_phone }}</td>
+                            <td>{{ p.email }}</td>
                             <td>{{ p.guests }}</td>
                             <td>{{ p.joined_at|date:"M d, Y H:i" }}</td>
                             <td>

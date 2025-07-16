@@ -12,13 +12,16 @@
         <div class="card shadow">
             <div class="card-body">
                 <h3 class="text-center mb-4">📋 Passenger History</h3>
+
+                <!-- Tabela -->
                 <table class="table table-striped text-center">
                     <thead class="table-primary">
                         <tr>
                             <th>Name</th>
+                            <th>Email</th>
                             <th>Phone</th>
                             <th>Guests</th>
-                            <th>Time Joined</th>
+                            <th>Time Joined the list</th>
                             <th>Time Called</th>
                         </tr>
                     </thead>
@@ -26,6 +29,7 @@
                         {% for log in logs %}
                         <tr>
                             <td>{{ log.name }}</td>
+                            <td>{{ log.email }}</td>
                             <td>+{{ log.country_code }}{{ log.phone }}</td>
                             <td>{{ log.guests }}</td>
                             <td>{{ log.time_joined|date:"M d, Y H:i" }}</td>
@@ -33,18 +37,77 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5">No passengers served yet.</td>
+                            <td colspan="6">No passengers served yet.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                <a href="/" class="btn btn-secondary">← Back to Queue</a>
-                <a href="/logs/pdf/" class="btn btn-outline-primary">⬇ Export PDF</a>
-                <a href="/logs/excel/" class="btn btn-outline-success ms-2">📊 Export Excel</a>
+
+                <!-- Ações -->
+                <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 gap-3">
+
+                    <!-- Botões principais -->
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <a href="/" class="btn btn-secondary">← Back to Queue</a>
+                        <a href="/logs/pdf/" class="btn btn-outline-primary">⬇ Export PDF</a>
+                        <a href="/logs/excel/" class="btn btn-outline-success">📊 Export Excel</a>
+                    </div>
+
+                    <!-- Clear logs by date -->
+                    <form id="clearByDateForm" action="{% url 'clear_logs_by_day' %}" method="post"
+                        class="d-flex flex-wrap align-items-center gap-2">
+                        {% csrf_token %}
+                        <label for="log_date" class="mb-0"><strong>Clear logs for:</strong></label>
+                        <input type="date" name="date" id="log_date" class="form-control" required>
+                        <input type="hidden" name="password" id="clearByDatePassword">
+                        <button type="submit" class="btn btn-danger" onclick="return confirmClearByDate()">🗑️</button>
+                    </form>
+
+                    <!-- Clear all logs -->
+                    <form id="clearAllForm" action="{% url 'clear_all_logs' %}" method="post"
+                        class="d-flex flex-wrap align-items-center gap-2">
+                        {% csrf_token %}
+                        <label class="mb-0"><strong>Clear <span class="text-danger">ALL</span> logs:</strong></label>
+                        <input type="hidden" name="password" id="clearAllPassword">
+                        <button type="submit" class="btn btn-outline-danger"
+                            onclick="return confirmClearAll()">💣</button>
+                    </form>
+
+                </div>
+
 
             </div>
         </div>
     </div>
+
+    <!-- JavaScript para confirmação com senha -->
+    <script>
+        function confirmClearByDate() {
+            if (confirm("Are you sure you want to delete logs for this date?")) {
+                const pwd = prompt("Enter admin password:");
+                if (pwd !== null && pwd.trim() !== "") {
+                    document.getElementById('clearByDatePassword').value = pwd;
+                    return true;
+                } else {
+                    alert("Password required.");
+                }
+            }
+            return false;
+        }
+
+        function confirmClearAll() {
+            if (confirm("⚠️ This will DELETE ALL passenger logs.\nAre you absolutely sure?")) {
+                const pwd = prompt("Enter admin password:");
+                if (pwd !== null && pwd.trim() !== "") {
+                    document.getElementById('clearAllPassword').value = pwd;
+                    return true;
+                } else {
+                    alert("Password required.");
+                }
+            }
+            return false;
+        }
+    </script>
 </body>
 
 </html>

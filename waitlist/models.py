@@ -1,10 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
-
-
 NOTIFICATION_CHOICES = [
-    ('sms', 'SMS'),
     ('email', 'Email'),
 ]
 
@@ -13,7 +10,7 @@ class Passenger(models.Model):
     country_code = models.CharField(max_length=7, default='+353')  # Irlanda como default
     local_phone = models.CharField(max_length=35)
     email = models.EmailField(blank=True, null=True)
-    notification_method = models.CharField(max_length=10, choices=NOTIFICATION_CHOICES, default='sms')
+    notification_method = models.CharField(max_length=10, choices=NOTIFICATION_CHOICES, default='email')
     guests = models.IntegerField(default=0)
     joined_at = models.DateTimeField(auto_now_add=True)
     called = models.BooleanField(default=False)

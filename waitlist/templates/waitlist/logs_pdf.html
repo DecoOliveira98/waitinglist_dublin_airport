@@ -38,20 +38,25 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>Email</th>
                 <th>Phone</th>
                 <th>Guests</th>
-                <th>Joined</th>
-                <th>Called</th>
+                <th>Time Joined the list</th>
+                <th>Time Called</th>
+
             </tr>
         </thead>
         <tbody>
             {% for log in logs %}
             <tr>
                 <td>{{ log.name }}</td>
+                <td>{{ log.email }}</td>
                 <td>+{{ log.country_code }}{{ log.phone }}</td>
                 <td>{{ log.guests }}</td>
                 <td>{{ log.time_joined|date:"Y-m-d H:i" }}</td>
                 <td>{{ log.time_called|date:"Y-m-d H:i" }}</td>
+
+
             </tr>
             {% empty %}
             <tr>

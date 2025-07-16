@@ -1,23 +1,6 @@
-"""
-URL configuration for waitinglist_dublin_airport project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from waitlist import views
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,19 +23,23 @@ urlpatterns = [
 
     # Detalhes e ações por passageiro
     path('passenger/<int:id>/', views.passenger_detail, name='passenger_detail'),
-    path('passenger/<int:id>/skip/', views.skip_passenger, name='skip_passenger'),
     path('passenger/<int:id>/call/', views.call_specific_passenger, name='call_specific_passenger'),
     path('delete/<int:pk>/', views.delete_passenger, name='delete_passenger'),
-
-    # Webhook do Twilio para receber resposta de SMS
-    path('sms/reply/', views.twilio_reply, name='sms_reply'),
-   
-    path('auto-remove/<int:id>/', views.auto_remove_passenger, name='auto_remove'),
 
     # Cancelar vaga
     path('cancel/<int:guest_id>/', views.cancel_spot, name='cancel_spot'),
     path('cancel/confirmation/', views.cancel_confirmation, name='cancel_confirmation'),
 
+    # Auto-remover passageiro
+    path('auto-remove/<int:id>/', views.auto_remove_passenger, name='auto_remove'),
+
+    # Limpar logs por dia
+    path('logs/clear-by-day/', views.clear_logs_by_day, name='clear_logs_by_day'),
+    path('logs/clear-all/', views.clear_all_logs, name='clear_all_logs'),
+
+    # Página de sucesso ao deletar logs
+    path('logs/deleted/', views.logs_deleted_success, name='logs_deleted_success'),
+
+
 
 ]
-

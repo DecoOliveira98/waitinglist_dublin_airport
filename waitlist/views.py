@@ -1,3 +1,4 @@
+import datetime
 import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
@@ -6,36 +7,59 @@ from django.utils import timezone
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail, EmailMultiAlternatives
-from twilio.rest import Client
-from twilio.twiml.messaging_response import MessagingResponse
 from xhtml2pdf import pisa
 import openpyxl
 from openpyxl.utils import get_column_letter
 from decouple import config
-
+from django.utils.dateparse import parse_date
+from django.views.decorators.http import require_POST
 from .models import Passenger, PassengerLog
+from django.shortcuts import render
 
-# ---------------- Email + SMS Templates ----------------
-message_addToQueue = (
-    "Hi {passenger.name}, you've been added to the lounge waiting list. "
-    "You will be notified when your spot is ready."
-)
-message_called = (
-    "Hi {passenger.name}, your lounge spot is ready. "
-    "Please proceed to reception. You have 10 minutes to arrive. "
-    "If not, reply '1' to cancel."
-)
-
-# ---------------- Utilidade ----------------
-
-def send_sms(to, message):
-    account_sid = config('TWILIO_ACCOUNT_SID')
-    auth_token = config('TWILIO_AUTH_TOKEN')
-    from_number = config('TWILIO_PHONE_NUMBER')
-    client = Client(account_sid, auth_token)
-    client.messages.create(body=message, from_=from_number, to=to)
 
 # ---------------- Views ----------------
+
+
+
+def logs_deleted_success(request):
+    return render(request, 'waitlist/logs_deleted.html')
+
+
+
+
+CLEAR_LOGS_PASSWORD = "admin123"  # 🔐 Troque isso por uma senha mais segura
+
+@require_POST
+def clear_logs_by_day(request):
+    password = request.POST.get("password")
+    if password != CLEAR_LOGS_PASSWORD:
+        return HttpResponse("❌ Incorrect password", status=403)
+
+    date_str = request.POST.get("date")
+    try:
+        date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        start = timezone.make_aware(datetime.datetime.combine(date_obj, datetime.time.min))
+        end = timezone.make_aware(datetime.datetime.combine(date_obj, datetime.time.max))
+
+        deleted, _ = PassengerLog.objects.filter(time_called__range=(start, end)).delete()
+        return redirect('logs_deleted_success')
+
+    except Exception as e:
+        return HttpResponse(f"❌ Error: {e}", status=500) and redirect('passenger_logs')
+
+@require_POST
+def clear_all_logs(request):
+    password = request.POST.get("password")
+    if password != CLEAR_LOGS_PASSWORD:
+        return HttpResponse("❌ Incorrect password", status=403) and redirect('passenger_logs')
+
+    deleted, _ = PassengerLog.objects.all().delete()
+    return redirect('logs_deleted_success')
+
+
+
+
+
 
 def cancel_confirmation(request):
     return render(request, 'cancel_confirmation.html')
@@ -45,25 +69,7 @@ def cancel_spot(request, guest_id):
     guest.delete()
     return HttpResponse("✅ Your spot has been successfully cancelled.")
 
-@csrf_exempt
-def twilio_reply(request):
-    if request.method == 'POST':
-        from_number = request.POST.get('From', '').strip()
-        body = request.POST.get('Body', '').strip()
-        response = MessagingResponse()
 
-        if body == "1":
-            passenger = next((p for p in Passenger.objects.all() if p.full_phone == from_number), None)
-            if passenger:
-                passenger.delete()
-                response.message("✅ You have been removed from the waiting list.")
-            else:
-                response.message("❌ We couldn't find your booking.")
-        else:
-            response.message("Send '1' if you wish to cancel your waiting list position.")
-
-        return HttpResponse(str(response), content_type="application/xml")
-    return HttpResponse("Invalid method", status=405)
 
 def add_passenger(request):
     if request.method == 'POST':
@@ -71,7 +77,6 @@ def add_passenger(request):
         country_code = request.POST['country_code']
         local_phone = re.sub(r'\D', '', request.POST['local_phone'])
         guests = int(request.POST.get('guests', 0))
-        notification_method = request.POST.get('notification_method', 'sms')
         email = request.POST.get('email', '').strip() or None
 
         passenger = Passenger.objects.create(
@@ -79,16 +84,13 @@ def add_passenger(request):
             country_code=country_code,
             local_phone=local_phone,
             guests=guests,
-            notification_method=notification_method,
+            notification_method='email',
             email=email
         )
 
-        message = message_addToQueue.format(passenger=passenger)
+        
 
-        if notification_method == 'sms':
-            send_sms(to=passenger.full_phone, message=message)
-
-        elif notification_method == 'email' and passenger.email:
+        if passenger.email:
             cancel_url = request.build_absolute_uri(f"/cancel/{passenger.id}/")
             subject = "The Liffey Lounge Waiting List Confirmation"
             from_email = config('HOST_USER')
@@ -117,12 +119,7 @@ def call_specific_passenger(request, id):
         time_joined=passenger.joined_at
     )
 
-    message = message_called.format(passenger=passenger)
-
-    if passenger.notification_method == 'sms':
-        send_sms(to=passenger.full_phone, message=message)
-
-    elif passenger.notification_method == 'email' and passenger.email:
+    if passenger.email:
         subject = "Lounge Spot Ready"
         from_email = config('HOST_USER')
         to_email = passenger.email
@@ -133,7 +130,7 @@ def call_specific_passenger(request, id):
             msg.attach_alternative(html_content, "text/html")
             msg.send()
         except Exception:
-            send_mail(subject, message, from_email, [to_email])
+            send_mail(subject, from_email, [to_email])
 
     return redirect('list')
 
@@ -150,20 +147,13 @@ def auto_remove_passenger(request, id):
         elapsed = timezone.now() - passenger.called_at
         if elapsed.total_seconds() >= 600:
             passenger.delete()
-            return HttpResponse("⛔ Passenger Removed after expiration.")
-        return HttpResponse("⏳ Not expired yet.")
-    return HttpResponse("❌Passenger not called or data not valid.")
+    
 
 def delete_passenger(request, pk):
     passenger = get_object_or_404(Passenger, pk=pk)
     passenger.delete()
     return redirect('list')
 
-def skip_passenger(request, id):
-    passenger = get_object_or_404(Passenger, id=id)
-    passenger.joined_at = timezone.now()
-    passenger.save()
-    return redirect('passenger_list')
 
 def passenger_list(request):
     passengers = Passenger.objects.order_by('joined_at')
